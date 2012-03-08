@@ -1,0 +1,86 @@
+input, nav a {
+  padding: 4px;
+  font-family: Helvetica;
+}
+nav {
+  margin-top: 1em;
+}
+input {
+    -moz-box-sizing: border-box;
+    font-size: 30px;
+    line-height: 30px;
+    width: 100%;
+    border: 1px solid #ccc;
+}
+nav a {
+  border-radius: 8px 8px 0 0;
+  font-size: 24px;
+  display: inline-block;
+  padding: 12px 16px 8px;
+  color: #666;
+  text-decoration: none;
+}
+nav a.active {
+  background: #eee;
+  color: #000;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+tr {
+  line-height: 2em;
+}
+td, td {
+  padding: 0 8px;
+}
+th, tr:nth-child(2n) {
+  background: #eee;
+}
+.loading {
+  -moz-animation-duration: .5s;
+  -moz-animation-name: pulse;
+  -moz-animation-direction: alternate;
+  -moz-animation-iteration-count: infinite;
+}
+
+@-moz-keyframes pulse {
+  from {
+    background-color: #fff !important;
+  }
+  to {
+    background-color: #ffc !important;
+  }
+}
+
+legend {
+    -moz-box-sizing: border-box;
+    border: 2px solid #000;
+    border-radius: 1em;
+    color: #fff;
+    padding: 1em 2em;
+    background: rgba(0,0,0,.9);
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    width: 300px;
+    height: 200px;
+    font: normal 12px sans-serif;
+    line-height: 1.4em;
+    pointer-events: none;
+    opacity: 0;
+    text-align: right;
+    -moz-transition: .3s opacity;
+}
+legend b {
+    color: #ff8;
+    font-size: 14px;
+    float: left;
+}
+
+legend.show {
+  opacity: 1;
+}
