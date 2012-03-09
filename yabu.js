@@ -2,6 +2,8 @@ var searchEl = $('#search')[0],
     nav = $('nav')[0],
     fields = 'id,assigned_to,priority,summary,status,whiteboard',
     sortField = 'priority',
+    tabTemplate = '<a href="#" data-query="{0}">{0}</a>',
+    titleTemplate = '({1}) {0} - yabu - yet another bugzilla ui',
     currentSearch = '',
     outstandingSearch,
     savedSearches = JSON.parse(localStorage['saved-bz-searches']) || [],
@@ -45,6 +47,7 @@ function handleResponse(response) {
         });
     });
     t.innerHTML = s;
+    document.title = format(titleTemplate, [currentSearch, bugs.length]);
     searchTimeout = setTimeout(function() {
         if (currentSearch) {
             getBugs(currentSearch);
@@ -158,7 +161,7 @@ function rememberSearch() {
     savedSearches.push(qs);
     savedSearchResults[qs] = localStorage['last-bz-response'];
     localStorage['saved-bz-searches'] = JSON.stringify(savedSearches);
-    nav.innerHTML += format('<a href="#">{0}</a>', [qs]);
+    nav.innerHTML += format(tabTemplate, [qs]);
     updateTabs();
 }
 function forgetSearch(query) {
@@ -179,7 +182,7 @@ if (window.location.search) {
 }
 if (savedSearches) {
     for (var i=0; i<savedSearches.length; i++) {
-        nav.innerHTML += format('<a href="#">{0}</a>', [savedSearches[i]]);
+        nav.innerHTML += format(tabTemplate, [savedSearches[i]]);
     }
 }
 if (currentSearch) {
