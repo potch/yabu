@@ -20,6 +20,14 @@ var format = (function() {
     return f;
 })();
 
+var escape_ = function(s) {
+    if (s === undefined) {
+        return;
+    }
+    return s.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;')
+            .replace(/'/g, '&#39;').replace(/"/g, '&#34;');
+};
+
 function handleResponse(response) {
     storeSearch(currentSearch, response);
     var resp = JSON.parse(response),
@@ -42,7 +50,7 @@ function handleResponse(response) {
             } else if (f == 'assigned_to') {
                 s += '<td>' + [b[f].name];
             } else {
-                s += '<td>'+(b[f]||'');
+                s += '<td>'+escape_(b[f]||'');
             }
         });
     });
