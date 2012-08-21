@@ -66,7 +66,7 @@ function handleResponse(response) {
 
 function progressListener() {
     var loadingEl = $('#loading');
-    if (this.readyState == 4) {
+    if (this.readyState == 4 && this.status) {
         loadingEl[0].classList.remove('loading');
         if (this.status == 200) {
             handleResponse(this.responseText);
@@ -129,16 +129,8 @@ searchForm.on('submit', function(e) {
     getBugs(searchEl.val());
 });
 
-Mousetrap.bind('s n', function() {
+Mousetrap.bind('s', function() {
     searchEl.select();
-});
-
-Mousetrap.bind('s r', function() {
-    rememberSearch();
-});
-
-Mousetrap.bind('s f', function() {
-    forgetSearch(currentSearch);
 });
 
 $('#legend').modal();
