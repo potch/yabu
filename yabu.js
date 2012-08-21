@@ -150,7 +150,7 @@ Mousetrap.bind(['0','1','2','3','4','5','6','7','8','9'], function(e) {
     if (e.charCode > 48 && e.charCode < 58) { // num keys
         var n = e.charCode - 49,
                 t = $('#tabs li').eq(n).find('a');
-        showTab(t)
+        if (t.length) showTab(t);
     }
 });
 
