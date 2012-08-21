@@ -47,7 +47,7 @@ function handleResponse(response) {
         s += '<tr>';
         f.forEach(function (f) {
             if (f == 'id') {
-                s += format('<td><a href="https://bugzil.la/{0}">{0}</a>',[b[f]]);
+                s += format('<td><a href="https://bugzilla.mozilla.org/show_bug.cgi?id={0}">{0}</a>',[b[f]]);
             } else if (f == 'assigned_to') {
                 s += '<td>' + [b[f].name];
             } else {
@@ -173,6 +173,9 @@ function closeTab(tab) {
     forgetSearch($(tab).data('query'));
 }
 function forgetSearch(query) {
+    if (outstandingSearch && currentSearch == query) {
+        outstandingSearch.abort();
+    }
     for (var i=0; i<savedSearches.length; i++) {
         if (query == savedSearches[i]) {
             savedSearches.splice(i,1);
@@ -183,6 +186,7 @@ function forgetSearch(query) {
     }
     updateTabs();
 }
+
 
 currentSearch = localStorage['last-bz-search'];
 if (window.location.search) {
