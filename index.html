@@ -3,24 +3,48 @@
   <head>
     <meta charset="utf-8">
     <title>yabu - yet another bugzilla ui</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
   </head>
   <body>
-    <article>
-      <input id="search" placeholder="quicksearch">
-      <nav>
-      </nav>
-      <table>
-      </table>
+    <article class="container-fluid">
+      <div class="navbar">
+        <div class="navbar-inner">
+          <a class="brand" href="#">yabu</a>
+          <form class="navbar-search pull-left" id="search-form">
+            <input id="search" placeholder="quicksearch" type="text" class="input-medium search-query">
+          </form>
+          <div id="loading" class="progress pull-right progress-striped active">
+            <div class="bar" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <ul class="nav nav-tabs" id="tabs">
+        </ul>
+      </div>
+      <div id="results">
+        <table class="table">
+          <th colspan=0>Loading Data&hellip;</th>
+        </table>
+      </div>
     </article>
-    <legend>
-      <p><b>1-9</b> select saved search</p>
-      <p><b>s</b> search</p>
-      <p><b>e</b> remember current search</p>
-      <p><b>f</b> forget current search</p>
-      <p><b>h</b> show help menu</p>
-    </legend>
-    <script src='picolib.js'></script>
+    <div class="modal hide" id="help">
+      <div class="modal-header">
+        <h2>Keyboard Shortcuts</h2>
+      </div>
+      <table class="table modal-body">
+        <tr><th>1-9   <td>select saved search
+        <tr><th>n s   <td>new search
+        <tr><th>s r   <td> remember current search
+        <tr><th>s f   <td>forget current search
+        <tr><th>h     <td> show help menu
+      </table>
+    </div>
+    <script src='jquery.min.js'></script>
+    <script src='bootstrap/js/bootstrap.js'></script>
+    <script src='mousetrap.min.js'></script>
     <script src='yabu.js'></script>
   </body>
 </html>

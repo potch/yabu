@@ -1,13 +1,14 @@
-var searchEl = $('#search')[0],
-    nav = $('nav')[0],
+var searchForm = $('#search-form'),
+    searchEl = $('#search'),
+    nav = $('#tabs'),
     fields = 'id,assigned_to,priority,summary,status,whiteboard',
     sortField = 'priority',
-    tabTemplate = '<a href="#" data-query="{0}">{0}</a>',
+    tabTemplate = '<li><a href="javascript:;" data-query="{0}"><button type="button" class="close">×</button>{0}</a></li>',
     titleTemplate = '({1}) {0} - yabu - yet another bugzilla ui',
     currentSearch = '',
     outstandingSearch,
-    savedSearches = JSON.parse(localStorage['saved-bz-searches']) || [],
-    savedSearchResults = JSON.parse(localStorage['saved-bz-search-results']) || {},
+    savedSearches = JSON.parse(localStorage['saved-bz-searches'] || '[]'),
+    savedSearchResults = JSON.parse(localStorage['saved-bz-search-results'] || '{}'),
     searchTimeout;
 
 var format = (function() {
@@ -64,18 +65,19 @@ function handleResponse(response) {
 }
 
 function progressListener() {
-    if (this.readyState == 4 && this.status == 200) {
-        loadingEl = $('.loading');
-        if (loadingEl.length) {
-            loadingEl[0].classList.remove('loading');
+    var loadingEl = $('#loading');
+    if (this.readyState == 4) {
+        loadingEl[0].classList.remove('loading');
+        if (this.status == 200) {
+            handleResponse(this.responseText);
         }
-        handleResponse(this.responseText);
     }
 }
 
 function storeSearch(query, response) {
     localStorage['last-bz-search'] = query;
     localStorage['last-bz-response'] = response;
+    rememberSearch();
     if (savedSearches.indexOf(query) >= 0) {
         savedSearchResults[query] = response;
         localStorage['saved-bz-search-results'] = JSON.stringify(savedSearchResults);
@@ -85,8 +87,8 @@ function storeSearch(query, response) {
 function getBugs(qs) {
     clearTimeout(searchTimeout);
     currentSearch = qs;
-    searchEl.value = qs;
-    searchEl.classList.add('loading');
+    searchEl.val(qs);
+    $('#loading')[0].classList.add('loading');
     updateTabs();
     searchEl.blur();
     if (outstandingSearch) {
@@ -103,7 +105,7 @@ function getBugs(qs) {
 }
 
 function updateTabs() {
-    var tabs = $('nav a');
+    var tabs = $('#tabs li');
     for (var i=0; i<savedSearches.length; i++) {
         tabs[i].classList.remove('active');
         if (currentSearch == savedSearches[i]) {
@@ -115,50 +117,52 @@ function updateTabs() {
 
 function showTab(e) {
     if (!e) return;
-    var query = e.innerHTML;
+    var query = $(e).data('query');
     getBugs(query);
     if (query in savedSearchResults) {
         handleResponse(savedSearchResults[query]);
     }
 }
 
-searchEl.addEventListener('keypress', function(e) {
-    e.stopPropagation();
-    if (e.keyCode == 13) {
-        getBugs(searchEl.value);
-    }
-    if (e.keyCode == 27) {
-        e.preventDefault();
-        searchEl.blur();
+searchForm.on('submit', function(e) {
+    e.preventDefault();
+    getBugs(searchEl.val());
+});
+
+Mousetrap.bind('s n', function() {
+    searchEl.select();
+});
+
+Mousetrap.bind('s r', function() {
+    rememberSearch();
+});
+
+Mousetrap.bind('s f', function() {
+    forgetSearch(currentSearch);
+});
+
+$('#legend').modal();
+Mousetrap.bind('h', function() {
+    $('#help').modal('toggle');
+});
+
+Mousetrap.bind(['0','1','2','3','4','5','6','7','8','9'], function(e) {
+    if (e.charCode > 48 && e.charCode < 58) { // num keys
+        var n = e.charCode - 49,
+                t = $('#tabs li').eq(n).find('a');
+        showTab(t)
     }
 });
 
-$(window).on('keypress', function(e) {
-    if (e.charCode == 115) { // s
-        searchEl.select();
-    }
-    if (e.charCode == 101) { // v
-        rememberSearch();
-    }
-    if (e.charCode == 102) { // v
-        forgetSearch(currentSearch);
-    }
-    if (e.charCode > 48 && e.charCode < 58) { // num keys
-        var n = e.charCode - 49,
-                t = $('nav a')[n];
-        showTab(t)
-    }
-    if (e.charCode == 104) { // h
-        $('legend')[0].classList.toggle("show");
-        e.preventDefault();
-    }
-});
-nav.addEventListener('click', function(e) {
-    e.preventDefault();
+nav.on('click', 'a', function(e) {
+    console.log(this);
     var tgt = e.target;
-    if (tgt.tagName == 'A') {
-        showTab(tgt);
-    }
+    showTab(this);
+});
+nav.on('click', '.close', function(e) {
+    var tgt = $(this).parent();
+    closeTab(tgt);
+    e.stopPropagation();
 });
 
 function rememberSearch() {
@@ -169,15 +173,19 @@ function rememberSearch() {
     savedSearches.push(qs);
     savedSearchResults[qs] = localStorage['last-bz-response'];
     localStorage['saved-bz-searches'] = JSON.stringify(savedSearches);
-    nav.innerHTML += format(tabTemplate, [qs]);
+    nav.append(format(tabTemplate, [qs]));
     updateTabs();
+}
+
+function closeTab(tab) {
+    forgetSearch($(tab).data('query'));
 }
 function forgetSearch(query) {
     for (var i=0; i<savedSearches.length; i++) {
         if (query == savedSearches[i]) {
             savedSearches.splice(i,1);
             localStorage['saved-bz-searches'] = JSON.stringify(savedSearches);
-            nav.removeChild(nav.childNodes[i+1]);
+            nav.children().eq(i).remove();
             break;
         };
     }
@@ -190,7 +198,7 @@ if (window.location.search) {
 }
 if (savedSearches) {
     for (var i=0; i<savedSearches.length; i++) {
-        nav.innerHTML += format(tabTemplate, [savedSearches[i]]);
+        nav.append(format(tabTemplate, [savedSearches[i]]));
     }
 }
 if (currentSearch) {
