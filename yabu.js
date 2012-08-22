@@ -1,8 +1,8 @@
 var searchForm = $('#search-form'),
     searchEl = $('#search'),
     nav = $('#tabs'),
-    fields = 'id,assigned_to,priority,summary,status,whiteboard',
-    sortField = 'priority',
+    fields = 'id,assigned_to,priority,summary,status,last_change_time,whiteboard',
+    sortField = 'last_change_time',
     tabTemplate = '<li><a href="javascript:;" data-query="{0}"><button type="button" class="close">×</button>{0}</a></li>',
     titleTemplate = '({1}) {0} - yabu - yet another bugzilla ui',
     currentSearch = '',
@@ -37,7 +37,7 @@ function handleResponse(response) {
         f = fields.split(','),
         s = '<thead>';
     bugs = bugs.sort(function(a,b) {
-        return a[sortField] > b[sortField];
+        return a[sortField] < b[sortField];
     });
     f.forEach(function (f) {
         s += '<th>'+f;
@@ -47,9 +47,12 @@ function handleResponse(response) {
         s += '<tr>';
         f.forEach(function (f) {
             if (f == 'id') {
-                s += format('<td><a href="https://bugzilla.mozilla.org/show_bug.cgi?id={0}">{0}</a>',[b[f]]);
+                s += format('<td><a target="_blank" href="https://bugzilla.mozilla.org/show_bug.cgi?id={0}">{0}</a>',[b[f]]);
             } else if (f == 'assigned_to') {
                 s += '<td>' + [b[f].name];
+            } else if (f == 'last_change_time') {
+                var d = []
+                s += '<td>' + timedelta(b[f]);
             } else {
                 s += '<td>'+escape_(b[f]||'');
             }
@@ -62,6 +65,23 @@ function handleResponse(response) {
             getBugs(currentSearch);
         }
     }, 1000 * 60 * 2);
+}
+
+function timedelta(d1) {
+    d1 = new Date(d1);
+    var d2 = new Date();
+    var d = ~~((d2.getTime() - d1.getTime()) / 1000);
+    if (d < 60) return 'just now';
+    if (d < 120) return 'a minute ago';
+    if (d < 3600) return ~~(d/60) + ' minutes ago';
+    d = ~~(d/3600);
+    if (d < 2) return 'an hour ago';
+    if (d < 24) return d + ' hours ago';
+    d = ~~(d/24);
+    if (d < 2) return 'a day ago';
+    if (d < 365) return d + ' days ago';
+    if (d < 365*2) return 'a year ago';
+    return ~~(d / 365) + ' years ago';
 }
 
 function progressListener() {
@@ -139,9 +159,10 @@ Mousetrap.bind('h', function() {
 });
 
 Mousetrap.bind(['0','1','2','3','4','5','6','7','8','9'], function(e) {
+    var n = e.charCode - 49;
+    var tabs = $('#tabs li');
+    var t = tabs.eq(Math.min(n,tabs.length-1)).find('a');
     if (e.charCode > 48 && e.charCode < 58) { // num keys
-        var n = e.charCode - 49,
-                t = $('#tabs li').eq(n).find('a');
         if (t.length) showTab(t);
     }
 });
