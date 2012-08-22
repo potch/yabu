@@ -2,6 +2,10 @@ var searchForm = $('#search-form'),
     searchEl = $('#search'),
     nav = $('#tabs'),
     fields = 'id,assigned_to,priority,summary,status,last_change_time,whiteboard',
+    fieldsPretty = {
+        'assigned_to': 'assigned to',
+        'last_change_time': 'changed'
+    },
     sortField = 'last_change_time',
     tabTemplate = '<li><a href="javascript:;" data-query="{0}"><button type="button" class="close">×</button>{0}</a></li>',
     titleTemplate = '({1}) {0} - yabu - yet another bugzilla ui',
@@ -40,7 +44,7 @@ function handleResponse(response) {
         return a[sortField] < b[sortField];
     });
     f.forEach(function (f) {
-        s += '<th>'+f;
+        s += '<th>' + fieldsPretty[f] || f;
     });
     s += '</thead><tbody>'
     bugs.forEach(function (b) {
@@ -191,7 +195,10 @@ function rememberSearch() {
 }
 
 function closeTab(tab) {
-    forgetSearch($(tab).data('query'));
+    var query = $(tab).data('query');
+    forgetSearch(query);
+    if (currentSearch == query)
+        showTab(nav.find('a').eq(0));
 }
 function forgetSearch(query) {
     if (outstandingSearch && currentSearch == query) {
