@@ -23,6 +23,15 @@ article {
 #loading.loading {
   display: block;
 }
+#results th {
+  cursor: pointer;
+}
+th.sorted:after {
+  content: ' \2191';
+}
+th.sorted.desc:after {
+  content: ' \2193';
+}
 .nav-tabs > li .close {
   margin: -2px 0 0 10px;
   font-size: 18px;

@@ -6,7 +6,8 @@ var searchForm = $('#search-form'),
         'assigned_to': 'assigned to',
         'last_change_time': 'changed'
     },
-    sortField = 'last_change_time',
+    sortField = localStorage['sort-field'] || 'last_change_time',
+    sortDirection = localStorage['sort-direction'] === 'true',
     tabTemplate = '<li><a href="javascript:;" data-query="{0}"><button type="button" class="close">×</button>{0}</a></li>',
     titleTemplate = '({1}) {0} - yabu - yet another bugzilla ui',
     currentSearch = '',
@@ -34,6 +35,7 @@ var escape_ = function(s) {
 };
 
 function handleResponse(response) {
+    clearTimeout(searchTimeout);
     storeSearch(currentSearch, response);
     var resp = JSON.parse(response),
         bugs = resp.bugs,
@@ -41,10 +43,19 @@ function handleResponse(response) {
         f = fields.split(','),
         s = '<thead>';
     bugs = bugs.sort(function(a,b) {
-        return a[sortField] < b[sortField];
+        if (sortDirection) {
+            return a[sortField] > b[sortField];
+        } else {
+            return a[sortField] < b[sortField];
+        }
     });
     f.forEach(function (f) {
-        s += '<th>' + (fieldsPretty[f] || f);
+        var className = '';
+        if (sortField === f) {
+            className = 'sorted ';
+            className += sortDirection ? 'asc' : 'desc';
+        }
+        s += format('<th class="{2}" data-field="{0}">{1}', [f, (fieldsPretty[f] || f), className]);
     });
     s += '</thead><tbody>'
     bugs.forEach(function (b) {
@@ -172,7 +183,6 @@ Mousetrap.bind(['0','1','2','3','4','5','6','7','8','9'], function(e) {
 });
 
 nav.on('click', 'a', function(e) {
-    console.log(this);
     var tgt = e.target;
     showTab(this);
 });
@@ -181,6 +191,23 @@ nav.on('click', '.close', function(e) {
     closeTab(tgt);
     e.stopPropagation();
 });
+
+$('#results').on('click', 'th', function() {
+    var field = $(this).data('field');
+    if (!field) return;
+    if (field != sortField) {
+        sortField = field;
+        localStorage['sort-field'] = sortField;
+    } else {
+        sortDirection = !sortDirection;
+        localStorage['sort-direction'] = sortDirection;
+    }
+    refreshResults();
+});
+
+function refreshResults() {
+    handleResponse(savedSearchResults[currentSearch]);
+}
 
 function rememberSearch() {
     var qs = localStorage['last-bz-search'];
