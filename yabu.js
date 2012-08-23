@@ -44,7 +44,7 @@ function handleResponse(response) {
         return a[sortField] < b[sortField];
     });
     f.forEach(function (f) {
-        s += '<th>' + fieldsPretty[f] || f;
+        s += '<th>' + (fieldsPretty[f] || f);
     });
     s += '</thead><tbody>'
     bugs.forEach(function (b) {
@@ -53,7 +53,7 @@ function handleResponse(response) {
             if (f == 'id') {
                 s += format('<td><a target="_blank" href="https://bugzilla.mozilla.org/show_bug.cgi?id={0}">{0}</a>',[b[f]]);
             } else if (f == 'assigned_to') {
-                s += '<td>' + [b[f].name];
+                s += '<td>' + b[f].name;
             } else if (f == 'last_change_time') {
                 var d = []
                 s += '<td>' + timedelta(b[f]);
