@@ -27,10 +27,10 @@ article {
   cursor: pointer;
 }
 th.sorted:after {
-  content: ' \2191';
+  content: '\00a0\2191';
 }
 th.sorted.desc:after {
-  content: ' \2193';
+  content: '\00a0\2193';
 }
 .nav-tabs > li .close {
   margin: -2px 0 0 10px;
