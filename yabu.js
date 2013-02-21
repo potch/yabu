@@ -43,11 +43,19 @@ function handleResponse(response) {
         f = fields.split(','),
         s = '<thead>';
     bugs = bugs.sort(function(a,b) {
-        if (sortDirection) {
-            return a[sortField] > b[sortField];
-        } else {
-            return a[sortField] < b[sortField];
+        var i = 0,
+            aa = a[sortField],
+            bb = b[sortField];
+        if(aa > bb) {
+            i = 1;
+        } else if(aa < bb) {
+            i = -1;
         }
+
+        if(!sortDirection) {
+            i *= -1;
+        }
+        return i;
     });
     f.forEach(function (f) {
         var className = '';
