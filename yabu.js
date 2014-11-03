@@ -137,7 +137,7 @@ function getBugs(qs) {
     if (outstandingSearch) {
         outstandingSearch.abort();
     }
-    var apiURL = "https://api-dev.bugzilla.mozilla.org/latest/bug?include_fields={0}&quicksearch={1}";
+    var apiURL = "https://bugzilla.mozilla.org/bzapi/latest/bug?include_fields={0}&quicksearch={1}";
     var client = new XMLHttpRequest();
     client.onreadystatechange = progressListener;
     client.open("GET", format(apiURL, [fields, qs]));
